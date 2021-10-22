@@ -8,12 +8,12 @@ Tested on:
 * macOS 10.15.7
 * Node 14.15.3
 
-1. Whitelist Terminal in System Preferences. Follow [this guide](https://help.rescuetime.com/article/59-how-do-i-enable-accessibility-permissions-on-mac-osx).
+1. Allow Terminal to use the Messages app in System Preferences. Follow [this guide](https://help.rescuetime.com/article/59-how-do-i-enable-accessibility-permissions-on-mac-osx).
 1. Start the express app:
     ```bash
     yarn start
     ```
-1. Send a message:
+1. Test by sending a message:
     ```bash
     curl --location --request POST 'localhost:5000/msg' \
       --header 'Content-Type: application/json' \
@@ -23,9 +23,10 @@ Tested on:
       }'
     ```
     Note: this only works if you have previously sent a message to the recipient on your Mac.
-2. Go write your own GUI.
+1. Go write your own GUI.
 
 ## Roadmap:
 
+* API revamp - websocket
 * Support for photo attachments
-* Two-way communication
+* Two-way communication -- ie. events for incoming messages
