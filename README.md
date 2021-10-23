@@ -27,6 +27,5 @@ Tested on:
 
 ## Roadmap:
 
-* API revamp - websocket
-* Support for photo attachments
 * Two-way communication -- ie. events for incoming messages
+* Support for photo attachments
