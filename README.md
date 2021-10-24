@@ -18,8 +18,10 @@ Tested on:
     curl --location --request POST 'localhost:5000/msg' \
       --header 'Content-Type: application/json' \
       --data-raw '{
-        "message": "test message",
-        "recipient": "+17801234567"
+        "content": {
+          "text": "test message"
+        },
+        "phoneOrEmail": "+17801234567"
       }'
     ```
     Note: this only works if you have previously sent a message to the recipient on your Mac.
