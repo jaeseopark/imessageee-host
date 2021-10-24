@@ -13,7 +13,7 @@ Tested on:
     ```bash
     yarn start
     ```
-1. Test by sending a message:
+1. Test by sending a [message](src/IMFMessage.ts):
     ```bash
     curl --location --request POST 'localhost:5000/msg' \
       --header 'Content-Type: application/json' \

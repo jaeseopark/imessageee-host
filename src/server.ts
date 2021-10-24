@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import enableWs from "express-ws";
 import { runAppleScript } from "run-applescript";
+import IMFMessage from "./IMFMessage.js";
 import { isValidJson } from "./serial.js";
 import { getTextScript } from "./template.js";
 
@@ -16,11 +17,10 @@ app.use(
     })
 );
 
-const SUCCESS_JSON = {
-    result: "success",
-};
-
-const sendMessagee = (message, recipient, attachment = null) => getTextScript(message, recipient).then(runAppleScript);
+const sendMessagee = (message: IMFMessage): Promise<IMFMessage> =>
+    getTextScript(message.content.text, message.phoneOrEmail)
+        .then(runAppleScript)
+        .then(() => ({ ...message, status: "sent" }));
 
 app.get("/contacts", (_, res) => {
     // TODO: pull live data from the Contacts app.
@@ -32,7 +32,7 @@ app.get("/contacts", (_, res) => {
 
 app.post("/msg", (req, res) => {
     console.log(req.body);
-    sendMessagee(req.body.message, req.body.recipient, req.body.attachment).then(() => res.send(SUCCESS_JSON));
+    sendMessagee(req.body).then(res.send);
 });
 
 app.ws("/msg", (ws) => {
@@ -48,8 +48,8 @@ app.ws("/msg", (ws) => {
         const reqBody = JSON.parse(msg);
         console.log(reqBody);
 
-        sendMessagee(reqBody.message, reqBody.recipient, reqBody.attachment)
-            .then(() => ws.send(JSON.stringify(SUCCESS_JSON)))
+        sendMessagee(reqBody)
+            .then((updatedMsg) => ws.send(JSON.stringify(updatedMsg)))
             .catch((error) =>
                 ws.send(
                     JSON.stringify({
