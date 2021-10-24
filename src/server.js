@@ -32,7 +32,7 @@ app.get("/contacts", (_, res) => {
 
 app.post("/msg", (req, res) => {
     console.log(req.body);
-    sendMessagee(req.body).then(res.send);
+    sendMessagee(req.body).then((body) => res.send(body));
 });
 
 app.ws("/msg", (ws) => {
