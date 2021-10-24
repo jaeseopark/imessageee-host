@@ -1,4 +1,5 @@
-export const getTextScript = (message, recipient) => Promise.resolve(`
+export const getTextScript = (message, recipient) =>
+    Promise.resolve(`
     tell application "Messages"
         set targetService to 1st service whose service type = iMessage
         set msg to "${message}"
