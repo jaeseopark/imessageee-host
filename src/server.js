@@ -2,7 +2,6 @@ import cors from "cors";
 import express from "express";
 import enableWs from "express-ws";
 import { runAppleScript } from "run-applescript";
-import IMFMessage from "./IMFMessage.js";
 import { isValidJson } from "./serial.js";
 import { getTextScript } from "./template.js";
 
@@ -32,7 +31,7 @@ app.get("/contacts", (_, res) => {
 
 app.post("/msg", (req, res) => {
     console.log(req.body);
-    sendMessagee(req.body).then((body) => res.send(body));
+    sendMessagee(req.body).then((resBody) => res.send(resBody));
 });
 
 app.ws("/msg", (ws) => {
@@ -49,7 +48,7 @@ app.ws("/msg", (ws) => {
         console.log(reqBody);
 
         sendMessagee(reqBody)
-            .then((updatedMsg) => ws.send(JSON.stringify(updatedMsg)))
+            .then((resBody) => ws.send(JSON.stringify(resBody)))
             .catch((error) =>
                 ws.send(
                     JSON.stringify({
