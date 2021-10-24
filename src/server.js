@@ -17,7 +17,7 @@ app.use(
     })
 );
 
-const sendMessagee = (message: IMFMessage): Promise<IMFMessage> =>
+const sendMessagee = (message) =>
     getTextScript(message.content.text, message.phoneOrEmail)
         .then(runAppleScript)
         .then(() => ({ ...message, status: "sent" }));
