@@ -4,8 +4,10 @@ import MessageHandlerFactory from "./bizlog/MessageHandlerFactoryImpl";
 import IMFMessage from "./datatype/IMFMessage";
 import IMFEvent from "./datatype/IMFEvent";
 import { MessageGetter, MessageSender } from "./interface/MessageHandler";
+import { split } from "./util/arrays";
 
 const GET_MESSAGE_POLL_INTERVAL = 1000; // ms
+const MESSAGES_PER_EVENT = 50;
 
 type OnReceive = (m: IMFEvent) => void;
 
@@ -25,12 +27,15 @@ class MessagesApp {
 
     listen = (onReceive: OnReceive) => {
         this.interval = setInterval(() => {
-            this.mGetter.getNewIncomingMessages().forEach(m => {
-                onReceive({ message: { ...m, isNew: true, } });
-            });
-            this.mGetter.getUpdatesToExistingMessages().forEach(m => {
-                onReceive({ message: { ...m, isNew: false } });
-            });
+            const messages = [
+                ...this.mGetter.getNewIncomingMessages().map(m => ({ ...m, isNew: true })),
+                ...this.mGetter.getUpdatesToExistingMessages().map(m => ({ ...m, isNew: false })),
+            ];
+            split(messages, MESSAGES_PER_EVENT).forEach(chunk => {
+                onReceive({
+                    messages: chunk
+                });
+            })
         }, GET_MESSAGE_POLL_INTERVAL);
     };
 
