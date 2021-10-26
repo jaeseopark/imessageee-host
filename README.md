@@ -4,7 +4,7 @@ A WebSocket abstraction layer on top of Apple's Messages app. Once installed on 
 
 Why create a proxy when you can use the Messages app out of the box? With imf, the client is no longer bound to macOS. As an obvious example, you can write a webapp and access it from any device on your home network.
 
-<img src="https://user-images.githubusercontent.com/20038316/138819386-082919f6-2581-4bb4-9460-d98ccbb4fce6.png" width=500 />
+<img src="https://user-images.githubusercontent.com/20038316/138819386-082919f6-2581-4bb4-9460-d98ccbb4fce6.png" width=750 />
 
 ## Usage
 
