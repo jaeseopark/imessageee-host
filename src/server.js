@@ -54,13 +54,14 @@ app.ws("/", (ws) => {
                     )
                 );
         });
-
-        ws.on("close", () => {
-            console.log("a client closed");
-        });
     };
 
     console.log("a new client connected");
+
+    ws.on("close", () => {
+        console.log("a client closed");
+    });
+
     configureClient();
 });
 
