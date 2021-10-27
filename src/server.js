@@ -25,35 +25,42 @@ app.use(
 
 // Handle outgoing messages (written by me)
 app.ws("/", (ws) => {
-    console.log("a new client connected");
-
-    messagesApp.getRecentMessagesAsEvents().then(events => events.forEach(event => ws.send(JSON.stringify(event))));
-
-    ws.on("message", (msg) => {
-        if (!isValidJson(msg)) {
-            return ws.send(
-                JSON.stringify({
-                    error: "Not a valid json string",
-                })
-            );
+    const configureClient = () => {
+        if (!messagesApp.isReady()) {
+            setTimeout(configureClient, 3000);
         }
 
-        const reqBody = JSON.parse(msg);
-        console.log(reqBody);
+        messagesApp.getRecentMessagesAsEvents().then(events => events.forEach(event => ws.send(JSON.stringify(event))));
 
-        messagesApp.send(reqBody)
-            .catch((error) =>
-                ws.send(
+        ws.on("message", (msg) => {
+            if (!isValidJson(msg)) {
+                return ws.send(
                     JSON.stringify({
-                        error,
+                        error: "Not a valid json string",
                     })
-                )
-            );
-    });
+                );
+            }
 
-    ws.on("close", () => {
-        console.log("a client closed");
-    });
+            const reqBody = JSON.parse(msg);
+            console.log(reqBody);
+
+            messagesApp.send(reqBody)
+                .catch((error) =>
+                    ws.send(
+                        JSON.stringify({
+                            error,
+                        })
+                    )
+                );
+        });
+
+        ws.on("close", () => {
+            console.log("a client closed");
+        });
+    };
+
+    console.log("a new client connected");
+    configureClient();
 });
 
 // Handle incoming messages (written by a friend)

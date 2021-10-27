@@ -48,6 +48,7 @@ class MessagesApp {
 
     listen = (onReceive: OnReceive) => {
         this.interval = setInterval(() => {
+            if (!this.isReady()) return;
             this.mGetter.getNewMessages()
                 .then((messages) => {
                     split(messages, MESSAGES_PER_EVENT).forEach(chunk => {
@@ -65,6 +66,8 @@ class MessagesApp {
             clearInterval(this.interval);
         }
     }
+
+    isReady = () => Object.keys(this.contactReverseLookup).length > 0;
 
     cleanup = () => {
         this.stopListening();
