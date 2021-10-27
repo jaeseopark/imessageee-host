@@ -59,13 +59,14 @@ app.ws("/", (ws) => {
 // Handle incoming messages (written by a friend)
 messagesApp.listen((m) => wsServer.clients.forEach(client => client.send(JSON.stringify(m))));
 
-const appServer = app.listen(port, () => console.log(`Listening on port ${port}...`));
+const httpServer = app.listen(port, () => console.log(`Listening on port ${port}...`));
 
 // Graceful shutdown
 const shutdown = () => {
     console.log('shutdown signal received');
     messagesApp.cleanup();
-    appServer.close();
+    httpServer.close();
+    wsServer.close();
 };
 
 process.on('SIGTERM', shutdown);
