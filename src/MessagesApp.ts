@@ -27,24 +27,16 @@ class MessagesApp {
     send = (m: IMFMessage) => this.mSender.send(m);
 
     listen = (onReceive: OnReceive) => {
-        const processMessages = (promise: Promise<IMFMessage[]>, isNew: boolean) => {
-            promise.then((messages) => {
-                return messages.map(m => ({ ...m, isNew }));
-            }).then((messages) => {
-                split(messages, MESSAGES_PER_EVENT).forEach(chunk => {
-                    onReceive({
-                        messages: chunk
-                    });
-                });
-                return null;
-            });
-        };
-
         this.interval = setInterval(() => {
-            const newMsgPromise = this.mGetter.getNewIncomingMessages();
-            const existingMsgPromise = this.mGetter.getUpdatesToExistingMessages();
-            processMessages(newMsgPromise, true);
-            processMessages(existingMsgPromise, false);
+            this.mGetter.getNewMessages()
+                .then((messages) => {
+                    split(messages, MESSAGES_PER_EVENT).forEach(chunk => {
+                        onReceive({
+                            messages: chunk
+                        });
+                    });
+                    return null;
+                });
         }, GET_MESSAGE_POLL_INTERVAL);
     };
 

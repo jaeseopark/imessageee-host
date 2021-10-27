@@ -27,18 +27,14 @@ class MessageGetterWithSqlite implements MessageGetter {
                 }
 
                 const messages: IMFMessage[] = rows.map(row => ({
-                    id: row.message_id.toString(),
-                    conversation: {
-                        alias: row.chat_identifier,
-                        handle: row.chat_identifier,
-                        isGroup: false, // TODO: support for group
-                        type: row.service
-                    },
+                    id: row.message_id,
+                    service: row.service,
                     timestamp: row.message_date,
                     status: getMessageStatus(row.is_from_me),
+                    handle: row.chat_identifier,
                     content: {
                         text: row.text
-                    }
+                    },
                 }));
                 resolve(messages);
             });
@@ -46,21 +42,16 @@ class MessageGetterWithSqlite implements MessageGetter {
 
     getRecentMessages = () => this.getMessages(0, 2000);
 
-    getNewIncomingMessages = () => this.getMessages(this.latestMessageId, 25)
+    getNewMessages = () => this.getMessages(this.latestMessageId, 25)
         .then(messages => {
             if (messages.length > 0) {
                 // messages are ordered in descending order
                 const [latestMessage] = messages;
-                this.latestMessageId = parseInt(latestMessage.id);
+                this.latestMessageId = latestMessage.id;
                 console.log(`this.latestMessageId=${this.latestMessageId}`);
             }
             return messages;
         });
-
-    getUpdatesToExistingMessages = async () => {
-        return [];
-        // throw new Error("Not implemented");
-    };
 
     close = () => {
         try {
