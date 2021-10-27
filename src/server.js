@@ -4,7 +4,7 @@ import expressWs from "express-ws";
 
 import {
     isValidJson
-} from "./serial.js";
+} from "./util/serial.js";
 import MessagesApp from "./MessagesApp.js";
 import MessageHandlerFactoryImpl from "./bizlog/MessageHandlerFactoryImpl.js";
 
