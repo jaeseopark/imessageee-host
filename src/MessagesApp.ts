@@ -18,12 +18,14 @@ class MessagesApp {
     private contactReverseLookup: ReverseLookp = {};
 
     constructor(factory: MessageHandlerFactory) {
+        console.log("Initializing MessagesApp...");
         this.mSender = factory.getMessageSender();
         this.mGetter = factory.getMessageGetter();
 
         factory.getContactGetter().getReverseLookup()
             .then(rLookup => {
                 this.contactReverseLookup = rLookup;
+                console.log("Reverse Lookup table registered");
             })
     }
 
