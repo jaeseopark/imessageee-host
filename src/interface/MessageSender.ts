@@ -1,6 +1,6 @@
-import IMFMessage from "../datatype/IMFMessage";
+import { IMFOutgoingMessage } from "../datatype/IMFMessage";
 
 export interface MessageSender {
-    sendMessage: (m: IMFMessage) => Promise<void>;
+    sendMessage: (m: IMFOutgoingMessage) => Promise<void>;
     close: () => void;
 };

@@ -1,5 +1,5 @@
 import MessageHandlerFactory from "./bizlog/MessageHandlerFactoryImpl";
-import IMFMessage from "./datatype/IMFMessage";
+import IMFMessage, { IMFOutgoingMessage } from "./datatype/IMFMessage";
 import IMFEvent from "./datatype/IMFEvent";
 import { split } from "./util/arrays";
 import { MessageSender } from "./interface/MessageSender";
@@ -44,7 +44,7 @@ class MessagesApp {
                     return { messages: chunk };
                 }));
 
-    send = (m: IMFMessage) => this.mSender.sendMessage(m);
+    send = (m: IMFOutgoingMessage) => this.mSender.sendMessage(m);
 
     listen = (onReceive: OnReceive) => {
         this.interval = setInterval(() => {

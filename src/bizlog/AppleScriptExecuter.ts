@@ -4,7 +4,7 @@ import {
     runAppleScriptSync
 } from "run-applescript";
 
-import IMFMessage from "../datatype/IMFMessage";
+import { IMFOutgoingMessage } from "../datatype/IMFMessage";
 import ContactGetter, { ReverseLookp } from "../interface/ContactGetter";
 import { MessageSender } from "../interface/MessageSender";
 
@@ -21,8 +21,11 @@ const getTextScript = (message: string, recipient: string, service: string) =>
 const GET_CONTACTS_SCRIPT = fs.readFileSync("src/applescript/getContacts.applescript", { encoding: "utf-8" });
 
 class AppleScriptExecuter implements MessageSender, ContactGetter {
-    sendMessage = (m: IMFMessage) => getTextScript(m.content.text!, m.handle, m.service)
-        .then((script) => { runAppleScriptSync(script); });
+    sendMessage = (m: IMFOutgoingMessage) => getTextScript(m.content.text!, m.handle, m.service || "iMessage")
+        .then((script) => { 
+            runAppleScriptSync(script);
+            console.log("message sent");
+         });
 
     getContacts = () => runAppleScript(GET_CONTACTS_SCRIPT)
         .then((csvWithoutHeader: string) => csvWithoutHeader.split("\n").reduce(
