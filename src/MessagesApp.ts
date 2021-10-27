@@ -5,7 +5,7 @@ import { MessageGetter, MessageSender } from "./interface/MessageHandler";
 import { split } from "./util/arrays";
 
 const GET_MESSAGE_POLL_INTERVAL = 1000; // ms
-const MESSAGES_PER_EVENT = 50;
+const MESSAGES_PER_EVENT = 100;
 
 type OnReceive = (m: IMFEvent) => void;
 

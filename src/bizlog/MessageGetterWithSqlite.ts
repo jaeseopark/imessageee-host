@@ -40,7 +40,7 @@ class MessageGetterWithSqlite implements MessageGetter {
             });
         });
 
-    getRecentMessages = () => this.getMessages(0, 2000);
+    getRecentMessages = () => this.getMessages(0, 1000);
 
     getNewMessages = () => this.getMessages(this.latestMessageId, 25)
         .then(messages => {

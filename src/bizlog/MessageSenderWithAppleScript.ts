@@ -5,7 +5,7 @@ import {
 import IMFMessage from "../datatype/IMFMessage";
 import { MessageSender } from "../interface/MessageHandler";
 
-export const getTextScript = (message: string, recipient: string, service: string) =>
+const getTextScript = (message: string, recipient: string, service: string) =>
     Promise.resolve(`
     tell application "Messages"
         set targetService to "${service}"
@@ -17,7 +17,7 @@ export const getTextScript = (message: string, recipient: string, service: strin
 
 
 class MessageSenderWithAppleScript implements MessageSender {
-    send = (m: IMFMessage) => getTextScript(m.content.text, m.handle)
+    send = (m: IMFMessage) => getTextScript(m.content.text!, m.handle, m.service)
         .then((script) => { runAppleScriptSync(script); });
 
     close = () => {
