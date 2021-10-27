@@ -1,8 +1,7 @@
-import IMFMessage, { Conversation } from "./IMFMessage";
+import IMFMessage from "./IMFMessage";
 
 type IMFEvent = {
     messages?: IMFMessage[];
-    conversations?: Conversation[];
 };
 
 export default IMFEvent;

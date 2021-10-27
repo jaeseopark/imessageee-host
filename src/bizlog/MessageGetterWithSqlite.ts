@@ -1,8 +1,8 @@
 import fs from "fs";
 import sqlite3 from "sqlite3";
-import IMFMessage, { IMFMessageStatus } from "../datatype/IMFMessage";
 
-import { MessageGetter } from "../interface/MessageHandler"
+import IMFMessage, { IMFMessageStatus } from "../datatype/IMFMessage";
+import { MessageGetter } from "../interface/MessageGetter";
 
 const SQLITE_PATH = `${process.env.HOME}/Library/Messages/chat.db`;
 
@@ -32,6 +32,7 @@ class MessageGetterWithSqlite implements MessageGetter {
                     timestamp: row.message_date,
                     status: getMessageStatus(row.is_from_me),
                     handle: row.chat_identifier,
+                    alias: row.chat_identifier,
                     content: {
                         text: row.text
                     },

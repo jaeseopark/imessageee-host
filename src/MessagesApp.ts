@@ -1,8 +1,10 @@
 import MessageHandlerFactory from "./bizlog/MessageHandlerFactoryImpl";
 import IMFMessage from "./datatype/IMFMessage";
 import IMFEvent from "./datatype/IMFEvent";
-import { MessageGetter, MessageSender } from "./interface/MessageHandler";
 import { split } from "./util/arrays";
+import { MessageSender } from "./interface/MessageSender";
+import { MessageGetter } from "./interface/MessageGetter";
+import { ReverseLookp } from "./interface/ContactGetter";
 
 const GET_MESSAGE_POLL_INTERVAL = 1000; // ms
 const MESSAGES_PER_EVENT = 100;
@@ -13,18 +15,34 @@ class MessagesApp {
     private interval?: NodeJS.Timer;
     private mSender: MessageSender;
     private mGetter: MessageGetter;
+    private contactReverseLookup: ReverseLookp = {};
 
     constructor(factory: MessageHandlerFactory) {
         this.mSender = factory.getMessageSender();
         this.mGetter = factory.getMessageGetter();
+
+        factory.getContactGetter().getReverseLookup()
+            .then(rLookup => {
+                this.contactReverseLookup = rLookup;
+            })
+    }
+
+    private substituteContactAliasInPlace = (message: IMFMessage) => {
+        const alias = this.contactReverseLookup[message.handle];
+        if (alias) {
+            message.alias = alias;
+        }
     }
 
     getRecentMessagesAsEvents = (): Promise<IMFEvent[]> =>
         this.mGetter.getRecentMessages()
             .then(messages => split(messages, MESSAGES_PER_EVENT)
-                .map(chunk => ({ messages: chunk })));
+                .map(chunk => {
+                    chunk.forEach(this.substituteContactAliasInPlace);
+                    return { messages: chunk };
+                }));
 
-    send = (m: IMFMessage) => this.mSender.send(m);
+    send = (m: IMFMessage) => this.mSender.sendMessage(m);
 
     listen = (onReceive: OnReceive) => {
         this.interval = setInterval(() => {

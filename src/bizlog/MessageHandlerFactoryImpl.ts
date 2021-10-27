@@ -1,11 +1,13 @@
-import { MessageHandlerFactory } from "../interface/MessageHandler";
+import { ICloudHandlerFactory } from "../interface/ICloudHandlerFactory";
 import MessageGetterWithSqlite from "./MessageGetterWithSqlite";
-import MessageSenderWithAppleScript from "./MessageSenderWithAppleScript"
+import AppleScriptExecuter from "./AppleScriptExecuter"
 
-class MessageHandlerFactoryImpl implements MessageHandlerFactory {
-    getMessageSender = () => {
-        return new MessageSenderWithAppleScript();
-    };
+class MessageHandlerFactoryImpl implements ICloudHandlerFactory {
+    private appleScriptExecutor = new AppleScriptExecuter();
+
+    getContactGetter = () => this.appleScriptExecutor;
+
+    getMessageSender = () => this.appleScriptExecutor;
 
     getMessageGetter = () => {
         return new MessageGetterWithSqlite();
