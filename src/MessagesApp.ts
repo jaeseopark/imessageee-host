@@ -1,5 +1,3 @@
-
-
 import MessageHandlerFactory from "./bizlog/MessageHandlerFactoryImpl";
 import IMFMessage from "./datatype/IMFMessage";
 import IMFEvent from "./datatype/IMFEvent";
@@ -12,7 +10,7 @@ const MESSAGES_PER_EVENT = 50;
 type OnReceive = (m: IMFEvent) => void;
 
 class MessagesApp {
-    private interval?: number;
+    private interval?: NodeJS.Timer;
     private mSender: MessageSender;
     private mGetter: MessageGetter;
 
@@ -21,21 +19,32 @@ class MessagesApp {
         this.mGetter = factory.getMessageGetter();
     }
 
-    getRecentConversations = (limit = 20) => this.mGetter.getRecentConversations(limit);
+    getRecentMessagesAsEvents = (): Promise<IMFEvent[]> =>
+        this.mGetter.getRecentMessages()
+            .then(messages => split(messages, MESSAGES_PER_EVENT)
+                .map(chunk => ({ messages: chunk })));
 
     send = (m: IMFMessage) => this.mSender.send(m);
 
     listen = (onReceive: OnReceive) => {
-        this.interval = setInterval(() => {
-            const messages = [
-                ...this.mGetter.getNewIncomingMessages().map(m => ({ ...m, isNew: true })),
-                ...this.mGetter.getUpdatesToExistingMessages().map(m => ({ ...m, isNew: false })),
-            ];
-            split(messages, MESSAGES_PER_EVENT).forEach(chunk => {
-                onReceive({
-                    messages: chunk
+        const processMessages = (promise: Promise<IMFMessage[]>, isNew: boolean) => {
+            promise.then((messages) => {
+                return messages.map(m => ({ ...m, isNew }));
+            }).then((messages) => {
+                split(messages, MESSAGES_PER_EVENT).forEach(chunk => {
+                    onReceive({
+                        messages: chunk
+                    });
                 });
-            })
+                return null;
+            });
+        };
+
+        this.interval = setInterval(() => {
+            const newMsgPromise = this.mGetter.getNewIncomingMessages();
+            const existingMsgPromise = this.mGetter.getUpdatesToExistingMessages();
+            processMessages(newMsgPromise, true);
+            processMessages(existingMsgPromise, false);
         }, GET_MESSAGE_POLL_INTERVAL);
     };
 
@@ -43,6 +52,12 @@ class MessagesApp {
         if (this.interval) {
             clearInterval(this.interval);
         }
+    }
+
+    cleanup = () => {
+        this.stopListening();
+        this.mSender.close();
+        this.mGetter.close();
     }
 };
 

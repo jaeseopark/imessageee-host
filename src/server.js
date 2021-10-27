@@ -14,7 +14,7 @@ const app = wsInstance.app;
 const wsServer = wsInstance.getWss();
 
 const messageHandlerFactory = new MessageHandlerFactoryImpl();
-const messages = new MessagesApp(messageHandlerFactory);
+const messagesApp = new MessagesApp(messageHandlerFactory);
 
 app.use(express.json());
 app.use(
@@ -25,7 +25,9 @@ app.use(
 
 // Handle outgoing messages (written by me)
 app.ws("/", (ws) => {
-    ws.send(JSON.stringify(messages.getRecentConversations()));
+    console.log("a new client connected");
+
+    messagesApp.getRecentMessagesAsEvents().then(events => events.forEach(event => ws.send(JSON.stringify(event))));
 
     ws.on("message", (msg) => {
         if (!isValidJson(msg)) {
@@ -39,7 +41,7 @@ app.ws("/", (ws) => {
         const reqBody = JSON.parse(msg);
         console.log(reqBody);
 
-        messages.send(reqBody)
+        messagesApp.send(reqBody)
             .catch((error) =>
                 ws.send(
                     JSON.stringify({
@@ -48,9 +50,23 @@ app.ws("/", (ws) => {
                 )
             );
     });
+
+    ws.on("close", () => {
+        console.log("a client closed");
+    });
 });
 
 // Handle incoming messages (written by a friend)
-messages.listen((m) => wsServer.clients.forEach(client => client.send(JSON.stringify(m))));
+messagesApp.listen((m) => wsServer.clients.forEach(client => client.send(JSON.stringify(m))));
 
-app.listen(port, () => console.log(`Listening on port ${port}...`));
+const appServer = app.listen(port, () => console.log(`Listening on port ${port}...`));
+
+// Graceful shutdown
+const shutdown = () => {
+    console.log('shutdown signal received');
+    messagesApp.cleanup();
+    appServer.close();
+};
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

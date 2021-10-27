@@ -1,13 +1,15 @@
-import IMFMessage, { Conversation } from "../datatype/IMFMessage";
+import IMFMessage from "../datatype/IMFMessage";
 
 export interface MessageGetter {
-    getNewIncomingMessages: () => IMFMessage[];
-    getUpdatesToExistingMessages: () => IMFMessage[];
-    getRecentConversations: (limit: number) => Conversation[];
+    getRecentMessages: () => Promise<IMFMessage[]>;
+    getNewIncomingMessages: () => Promise<IMFMessage[]>;
+    getUpdatesToExistingMessages: () => Promise<IMFMessage[]>;
+    close: () => void;
 };
 
 export interface MessageSender {
     send: (m: IMFMessage) => Promise<void>;
+    close: () => void;
 };
 
 export interface MessageHook {

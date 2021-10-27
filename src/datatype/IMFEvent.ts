@@ -1,9 +1,7 @@
 import IMFMessage, { Conversation } from "./IMFMessage";
 
-type DecoratedIMFMessage = IMFMessage & { isNew: boolean };
-
 type IMFEvent = {
-    messages?: DecoratedIMFMessage[];
+    messages?: IMFMessage[];
     conversations?: Conversation[];
 };
 

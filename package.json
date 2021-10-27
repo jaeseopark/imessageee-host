@@ -5,6 +5,7 @@
   "main": "dist/src/server.js",
   "type": "module",
   "dependencies": {
+    "@types/sqlite3": "^3.1.7",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-ws": "^5.0.2",
