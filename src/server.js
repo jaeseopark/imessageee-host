@@ -28,6 +28,7 @@ app.ws("/", (ws) => {
     const configureClient = () => {
         if (!messagesApp.isReady()) {
             setTimeout(configureClient, 3000);
+            return;
         }
 
         messagesApp.getRecentMessagesAsEvents().then(events => events.forEach(event => ws.send(JSON.stringify(event))));
