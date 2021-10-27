@@ -4,13 +4,8 @@ export type AttachmentType = "photo" | "video";
 
 export type Service = "iMessage" | "SMS";
 
-type IMFMessage = {
-    id: number;
-    timestamp: number;
-    status: IMFMessageStatus;
-    alias: string;
+type IMFBaseMessage = {
     handle: string;
-    service: Service;
     content: {
         text?: string;
         attachment?: {
@@ -18,6 +13,18 @@ type IMFMessage = {
             data: string; // placeholder
         };
     };
+};
+
+export type OutgoingMessage = IMFBaseMessage & {
+    service?: Service;
+};
+
+type IMFMessage =  IMFBaseMessage & {
+    id: number;
+    service: Service;
+    alias: string;
+    status: IMFMessageStatus;
+    timestamp: number;
 };
 
 export default IMFMessage;
