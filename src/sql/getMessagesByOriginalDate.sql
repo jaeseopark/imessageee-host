@@ -3,7 +3,9 @@ select
     chat_identifier,
     text,
     service,
-    message_date,
+    cast(
+        (date / 1000000000) + strftime('%s', '2001-01-01') as integer
+    ) * 1000 as message_date,
     is_from_me
 from
     message m
