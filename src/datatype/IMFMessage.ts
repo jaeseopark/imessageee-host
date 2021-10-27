@@ -16,12 +16,12 @@ type IMFBaseMessage = {
 };
 
 export type IMFOutgoingMessage = IMFBaseMessage & {
-    service?: Service;
+    service?: IMFService;
 };
 
 type IMFMessage = IMFBaseMessage & {
     id: number;
-    service: Service;
+    service: IMFService;
     alias: string;
     status: IMFMessageStatus;
     timestamp: number;
