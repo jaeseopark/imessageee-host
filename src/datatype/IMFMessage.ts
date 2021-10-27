@@ -2,7 +2,7 @@ export type IMFMessageStatus = "sending" | "sent" | "read" | "received";
 
 export type AttachmentType = "photo" | "video";
 
-export type Service = "iMessage" | "SMS";
+export type IMFService = "iMessage" | "SMS";
 
 type IMFBaseMessage = {
     handle: string;
@@ -15,11 +15,11 @@ type IMFBaseMessage = {
     };
 };
 
-export type OutgoingMessage = IMFBaseMessage & {
+export type IMFOutgoingMessage = IMFBaseMessage & {
     service?: Service;
 };
 
-type IMFMessage =  IMFBaseMessage & {
+type IMFMessage = IMFBaseMessage & {
     id: number;
     service: Service;
     alias: string;
