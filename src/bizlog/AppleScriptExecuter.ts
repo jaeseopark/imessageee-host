@@ -11,7 +11,7 @@ import { MessageSender } from "../interface/MessageSender";
 const getTextScript = (message: string, recipient: string, service: string) =>
     Promise.resolve(`
     tell application "Messages"
-        set targetService to "${service}"
+        set targetService to 1st service whose service type = ${service}
         set msg to "${message}"
         set recipient to buddy "${recipient}" of targetService
         send msg to recipient
@@ -21,7 +21,8 @@ const getTextScript = (message: string, recipient: string, service: string) =>
 const GET_CONTACTS_SCRIPT = fs.readFileSync("src/applescript/getContacts.applescript", { encoding: "utf-8" });
 
 class AppleScriptExecuter implements MessageSender, ContactGetter {
-    sendMessage = (m: IMFOutgoingMessage) => getTextScript(m.content.text!, m.handle, m.service || "iMessage")
+    sendMessage = (m: IMFOutgoingMessage) => 
+        getTextScript(m.content.text!, m.handle, m.service || "iMessage")
         .then((script) => { 
             runAppleScriptSync(script);
             console.log("message sent");
