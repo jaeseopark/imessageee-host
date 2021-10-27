@@ -1,6 +1,6 @@
 export type IMFMessageStatus = "sending" | "sent" | "read" | "received";
 
-export type AttachmentType = "photo" | "video";
+export type IMFAttachmentType = "photo" | "video";
 
 export type IMFService = "iMessage" | "SMS";
 
@@ -9,7 +9,7 @@ type IMFBaseMessage = {
     content: {
         text?: string;
         attachment?: {
-            type: AttachmentType;
+            type: IMFAttachmentType;
             data: string; // placeholder
         };
     };
