@@ -6,6 +6,6 @@ interface ContactGetter {
     getContacts: () => Promise<IMFContact[]>;
     getReverseLookup: () => Promise<ReverseLookp>;
     close: () => void;
-};
+}
 
 export default ContactGetter;

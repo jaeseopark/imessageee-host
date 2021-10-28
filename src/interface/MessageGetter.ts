@@ -4,4 +4,4 @@ export interface MessageGetter {
     getRecentMessages: () => Promise<IMFMessage[]>;
     getNewMessages: () => Promise<IMFMessage[]>;
     close: () => void;
-};
+}

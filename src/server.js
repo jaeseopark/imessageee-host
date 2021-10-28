@@ -2,9 +2,7 @@ import cors from "cors";
 import express from "express";
 import expressWs from "express-ws";
 
-import {
-    isValidJson
-} from "./util/serial.js";
+import { isValidJson } from "./util/serial.js";
 import MessagesApp from "./MessagesApp.js";
 import MessageHandlerFactoryImpl from "./bizlog/MessageHandlerFactoryImpl.js";
 
@@ -31,7 +29,9 @@ app.ws("/", (ws) => {
             return;
         }
 
-        messagesApp.getRecentMessagesAsEvents().then(events => events.forEach(event => ws.send(JSON.stringify(event))));
+        messagesApp
+            .getRecentMessagesAsEvents()
+            .then((events) => events.forEach((event) => ws.send(JSON.stringify(event))));
 
         ws.on("message", (msg) => {
             if (!isValidJson(msg)) {
@@ -45,14 +45,13 @@ app.ws("/", (ws) => {
             const reqBody = JSON.parse(msg);
             console.log(reqBody);
 
-            messagesApp.send(reqBody)
-                .catch((error) =>
-                    ws.send(
-                        JSON.stringify({
-                            error,
-                        })
-                    )
-                );
+            messagesApp.send(reqBody).catch((error) =>
+                ws.send(
+                    JSON.stringify({
+                        error,
+                    })
+                )
+            );
         });
     };
 
@@ -66,17 +65,17 @@ app.ws("/", (ws) => {
 });
 
 // Handle incoming messages (written by a friend)
-messagesApp.listen((m) => wsServer.clients.forEach(client => client.send(JSON.stringify(m))));
+messagesApp.listen((m) => wsServer.clients.forEach((client) => client.send(JSON.stringify(m))));
 
 const httpServer = app.listen(port, () => console.log(`Listening on port ${port}...`));
 
 // Graceful shutdown
 const shutdown = () => {
-    console.log('shutdown signal received');
+    console.log("shutdown signal received");
     messagesApp.cleanup();
     httpServer.close();
     wsServer.close();
 };
 
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

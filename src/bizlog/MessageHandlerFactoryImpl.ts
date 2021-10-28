@@ -1,6 +1,6 @@
 import { ICloudHandlerFactory } from "../interface/ICloudHandlerFactory";
 import MessageGetterWithSqlite from "./MessageGetterWithSqlite";
-import AppleScriptExecuter from "./AppleScriptExecuter"
+import AppleScriptExecuter from "./AppleScriptExecuter";
 
 class MessageHandlerFactoryImpl implements ICloudHandlerFactory {
     private appleScriptExecutor = new AppleScriptExecuter();
@@ -11,7 +11,7 @@ class MessageHandlerFactoryImpl implements ICloudHandlerFactory {
 
     getMessageGetter = () => {
         return new MessageGetterWithSqlite();
-    }
+    };
 }
 
 export default MessageHandlerFactoryImpl;

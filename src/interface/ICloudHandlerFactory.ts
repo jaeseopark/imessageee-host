@@ -6,4 +6,4 @@ export interface ICloudHandlerFactory {
     getMessageGetter: () => MessageGetter;
     getMessageSender: () => MessageSender;
     getContactGetter: () => ContactGetter;
-};
+}

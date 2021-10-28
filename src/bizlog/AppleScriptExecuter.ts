@@ -1,8 +1,5 @@
 import fs from "fs";
-import {
-    runAppleScript,
-    runAppleScriptSync
-} from "run-applescript";
+import { runAppleScript, runAppleScriptSync } from "run-applescript";
 
 import { IMFOutgoingMessage } from "../datatype/IMFMessage";
 import ContactGetter, { ReverseLookp } from "../interface/ContactGetter";
@@ -21,32 +18,35 @@ const getTextScript = (message: string, recipient: string, service: string) =>
 const GET_CONTACTS_SCRIPT = fs.readFileSync("src/applescript/getContacts.applescript", { encoding: "utf-8" });
 
 class AppleScriptExecuter implements MessageSender, ContactGetter {
-    sendMessage = (m: IMFOutgoingMessage) => 
-        getTextScript(m.content.text!, m.handle, m.service || "iMessage")
-        .then((script) => { 
+    sendMessage = (m: IMFOutgoingMessage) =>
+        getTextScript(m.content.text!, m.handle, m.service || "iMessage").then((script) => {
             runAppleScriptSync(script);
             console.log("message sent");
-         });
-
-    getContacts = () => runAppleScript(GET_CONTACTS_SCRIPT)
-        .then((csvWithoutHeader: string) => csvWithoutHeader.split("\n").reduce(
-            (acc: { [name: string]: string[] }, line: string) => {
-                const [name, handle] = line.split(",");
-                if (acc.hasOwnProperty(name)) acc[name].push(handle);
-                else acc[name] = [handle];
-                return acc;
-            }, {}))
-        .then((contactMap) => {
-            return Object.keys(contactMap).map(name => ({ name, handles: contactMap[name] }))
         });
 
-    getReverseLookup = () => this.getContacts()
-        .then(contacts => contacts.reduce((acc: ReverseLookp, contact) => {
-            contact.handles.forEach(handle => {
-                acc[handle] = contact.name;
-            })
-            return acc;
-        }, {}));
+    getContacts = () =>
+        runAppleScript(GET_CONTACTS_SCRIPT)
+            .then((csvWithoutHeader: string) =>
+                csvWithoutHeader.split("\n").reduce((acc: { [name: string]: string[] }, line: string) => {
+                    const [name, handle] = line.split(",");
+                    if (acc.hasOwnProperty(name)) acc[name].push(handle);
+                    else acc[name] = [handle];
+                    return acc;
+                }, {})
+            )
+            .then((contactMap) => {
+                return Object.keys(contactMap).map((name) => ({ name, handles: contactMap[name] }));
+            });
+
+    getReverseLookup = () =>
+        this.getContacts().then((contacts) =>
+            contacts.reduce((acc: ReverseLookp, contact) => {
+                contact.handles.forEach((handle) => {
+                    acc[handle] = contact.name;
+                });
+                return acc;
+            }, {})
+        );
 
     close = () => {
         // No cleanup needed

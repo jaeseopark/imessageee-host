@@ -26,7 +26,7 @@ class MessageGetterWithSqlite implements MessageGetter {
                     reject(err);
                 }
 
-                const messages: IMFMessage[] = rows.map(row => ({
+                const messages: IMFMessage[] = rows.map((row) => ({
                     id: row.message_id,
                     service: row.service,
                     timestamp: row.message_date,
@@ -34,7 +34,7 @@ class MessageGetterWithSqlite implements MessageGetter {
                     handle: row.chat_identifier,
                     alias: row.chat_identifier,
                     content: {
-                        text: row.text
+                        text: row.text,
                     },
                 }));
                 resolve(messages);
@@ -43,8 +43,8 @@ class MessageGetterWithSqlite implements MessageGetter {
 
     getRecentMessages = () => this.getMessages(0, 1000);
 
-    getNewMessages = () => this.getMessages(this.latestMessageId, 25)
-        .then(messages => {
+    getNewMessages = () =>
+        this.getMessages(this.latestMessageId, 25).then((messages) => {
             if (messages.length > 0) {
                 // messages are ordered in descending order
                 const [latestMessage] = messages;
@@ -62,6 +62,6 @@ class MessageGetterWithSqlite implements MessageGetter {
             console.error(err);
         }
     };
-};
+}
 
 export default MessageGetterWithSqlite;
