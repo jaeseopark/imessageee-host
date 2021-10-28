@@ -6,6 +6,15 @@ Why create a proxy when you can use the Messages app out of the box? With imf, t
 
 <img src="https://user-images.githubusercontent.com/20038316/138819386-082919f6-2581-4bb4-9460-d98ccbb4fce6.png" width=750 />
 
+
+## Features
+
+* Send _n_ most recent messages (default=1000) when a new client connects.
+* Broadcast incoming messages to all connected sockets.
+* Forward outgoing message using Apple Script.
+
+For upcoming features, see [Issues](https://github.com/jaeseopark/imessageforwarder/issues).
+
 ## Usage
 
 Tested on:
@@ -26,7 +35,3 @@ Tested on:
     ```
 1. Proceed to installing [react-imf](https://github.com/jaeseopark/react-imf) or bring your own GUI. Happy messaging!
 
-## Roadmap:
-
-* Support for photo/video attachments
-* Support for group chats
