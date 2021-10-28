@@ -22,11 +22,13 @@ class MessagesApp {
         this.mSender = factory.getMessageSender();
         this.mGetter = factory.getMessageGetter();
 
-        factory.getContactGetter().getReverseLookup()
-            .then(rLookup => {
+        factory
+            .getContactGetter()
+            .getReverseLookup()
+            .then((rLookup) => {
                 this.contactReverseLookup = rLookup;
                 console.log("Reverse Lookup table registered");
-            })
+            });
     }
 
     private substituteContactAliasInPlace = (message: IMFMessage) => {
@@ -34,30 +36,29 @@ class MessagesApp {
         if (alias) {
             message.alias = alias;
         }
-    }
+    };
 
     getRecentMessagesAsEvents = (): Promise<IMFEvent[]> =>
-        this.mGetter.getRecentMessages()
-            .then(messages => split(messages, MESSAGES_PER_EVENT)
-                .map(chunk => {
-                    chunk.forEach(this.substituteContactAliasInPlace);
-                    return { messages: chunk };
-                }));
+        this.mGetter.getRecentMessages().then((messages) =>
+            split(messages, MESSAGES_PER_EVENT).map((chunk) => {
+                chunk.forEach(this.substituteContactAliasInPlace);
+                return { messages: chunk };
+            })
+        );
 
     send = (m: IMFOutgoingMessage) => this.mSender.sendMessage(m);
 
     listen = (onReceive: OnReceive) => {
         this.interval = setInterval(() => {
             if (!this.isReady()) return;
-            this.mGetter.getNewMessages()
-                .then((messages) => {
-                    split(messages, MESSAGES_PER_EVENT).forEach(chunk => {
-                        onReceive({
-                            messages: chunk
-                        });
+            this.mGetter.getNewMessages().then((messages) => {
+                split(messages, MESSAGES_PER_EVENT).forEach((chunk) => {
+                    onReceive({
+                        messages: chunk,
                     });
-                    return null;
                 });
+                return null;
+            });
         }, GET_MESSAGE_POLL_INTERVAL);
     };
 
@@ -65,7 +66,7 @@ class MessagesApp {
         if (this.interval) {
             clearInterval(this.interval);
         }
-    }
+    };
 
     isReady = () => Object.keys(this.contactReverseLookup).length > 0;
 
@@ -73,7 +74,7 @@ class MessagesApp {
         this.stopListening();
         this.mSender.close();
         this.mGetter.close();
-    }
-};
+    };
+}
 
 export default MessagesApp;
