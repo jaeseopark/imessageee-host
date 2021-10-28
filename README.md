@@ -1,33 +1,37 @@
-# imessageforwarder
+# imessageforwarder (imf)
 
-A node express app to send iMessages. The app is be hosted on an iCloud-enabled Mac and uses Apple Script to interact with Apple's Messages app.
+A WebSocket abstraction layer on top of Apple's Messages app. Once installed on an iCloud-enabled device, imf allows you to bring your own GUI to send/receive iMessages.
+
+Why create a proxy when you can use the Messages app out of the box? With imf, the client is no longer bound to macOS. As an obvious example, you can write a webapp and access it from any device on your home network.
+
+<img src="https://user-images.githubusercontent.com/20038316/138819386-082919f6-2581-4bb4-9460-d98ccbb4fce6.png" width=750 />
+
+
+## Features
+
+* Send _n_ most recent messages (default=1000) when a new client connects.
+* Broadcast incoming messages to all connected sockets.
+* Forward outgoing message using Apple Script.
+
+For upcoming features, see [Issues](https://github.com/jaeseopark/imessageforwarder/issues).
 
 ## Usage
 
 Tested on:
-* macOS 10.15.7
+* macOS 11.6
 * Node 14.15.3
 
-1. Allow Terminal to use the Messages app in System Preferences. Follow [this guide](https://help.rescuetime.com/article/59-how-do-i-enable-accessibility-permissions-on-mac-osx).
+1. Install dependencies
+     ```bash
+     yarn install
+     ```
 1. Start the express app:
     ```bash
     yarn start
-    ```
-1. Test by sending a [message](src/IMFMessage.ts):
-    ```bash
-    curl --location --request POST 'localhost:5000/msg' \
-      --header 'Content-Type: application/json' \
-      --data-raw '{
-        "content": {
-          "text": "test message"
-        },
-        "phoneOrEmail": "+17801234567"
-      }'
-    ```
-    Note: this only works if you have previously sent a message to the recipient on your Mac.
-1. Go write your own GUI.
 
-## Roadmap:
+    # or
 
-* Two-way communication -- ie. events for incoming messages
-* Support for photo attachments
+    IMF_PORT=1234 yarn start # customize the port
+    ```
+1. Proceed to installing [react-imf](https://github.com/jaeseopark/react-imf) or bring your own GUI. Happy messaging!
+
