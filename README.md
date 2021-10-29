@@ -10,8 +10,8 @@ Why create a proxy when you can use the Messages app out of the box? With imf, t
 ## Features
 
 * Send _n_ most recent messages (default=1000) when a new client connects.
-* Broadcast incoming messages to all connected sockets.
-* Forward outgoing message using Apple Script.
+* Broadcast incoming messages to all connected clients.
+* Send iMessage/SMS.
 
 For upcoming features, see [Issues](https://github.com/jaeseopark/imessageforwarder/issues).
 
