@@ -38,11 +38,11 @@ class MessagesApp {
         }
     };
 
-    getRecentMessagesAsEvents = (): Promise<IMFEvent[]> =>
+    getPreloadEvents = (): Promise<IMFEvent[]> =>
         this.mGetter.getRecentMessages().then((messages) =>
             split(messages, MESSAGES_PER_EVENT).map((chunk) => {
                 chunk.forEach(this.substituteContactAliasInPlace);
-                return { messages: chunk };
+                return { messages: chunk, type: "MESSAGE_PRELOAD" };
             })
         );
 
@@ -55,6 +55,7 @@ class MessagesApp {
                 split(messages, MESSAGES_PER_EVENT).forEach((chunk) => {
                     onReceive({
                         messages: chunk,
+                        type: "MESSAGE_NEW",
                     });
                 });
                 return null;
