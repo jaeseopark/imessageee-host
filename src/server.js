@@ -30,7 +30,7 @@ app.ws("/", (ws) => {
         }
 
         messagesApp
-            .getRecentMessagesAsEvents()
+            .getPreloadEvents()
             .then((events) => events.forEach((event) => ws.send(JSON.stringify(event))));
 
         ws.on("message", (msg) => {
