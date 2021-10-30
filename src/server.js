@@ -6,7 +6,7 @@ import { isValidJson } from "./util/serial.js";
 import MessagesApp from "./MessagesApp.js";
 import MessageHandlerFactoryImpl from "./bizlog/MessageHandlerFactoryImpl.js";
 
-const port = process.env.IMF_PORT || 5000;
+const port = process.env.IMF_PORT || 3237;
 const wsInstance = expressWs(express());
 const app = wsInstance.app;
 const wsServer = wsInstance.getWss();
