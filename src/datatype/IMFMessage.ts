@@ -2,15 +2,17 @@ export type IMFMessageStatus = "sending" | "sent" | "read" | "received";
 
 export type IMFService = "iMessage" | "SMS";
 
+export type IMFMessageContent = {
+    text?: string;
+    attachment?: {
+        id: number;
+        mimetype: string;
+    };
+};
+
 type IMFBaseMessage = {
     handle: string;
-    content: {
-        text?: string;
-        attachment?: {
-            id: number;
-            mimetype: string;
-        };
-    };
+    content: IMFMessageContent;
 };
 
 export type IMFOutgoingMessage = IMFBaseMessage & {
