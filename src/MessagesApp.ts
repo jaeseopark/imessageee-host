@@ -63,6 +63,8 @@ class MessagesApp {
         }, GET_MESSAGE_POLL_INTERVAL);
     };
 
+    getAttachmentPath = (attachmentId: number) => this.mGetter.getAttachmentPath(attachmentId);
+
     stopListening = () => {
         if (this.interval) {
             clearInterval(this.interval);

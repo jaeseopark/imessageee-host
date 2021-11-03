@@ -2,7 +2,9 @@ import cors from "cors";
 import express from "express";
 import expressWs from "express-ws";
 
-import { isValidJson } from "./util/serial.js";
+import {
+    isValidJson
+} from "./util/serial.js";
 import MessagesApp from "./MessagesApp.js";
 import MessageHandlerFactoryImpl from "./bizlog/MessageHandlerFactoryImpl.js";
 
@@ -66,6 +68,13 @@ app.ws("/", (ws) => {
 
 // Handle incoming messages (written by a friend)
 messagesApp.listen((m) => wsServer.clients.forEach((client) => client.send(JSON.stringify(m))));
+
+// Handle file requests (HTTP)
+app.get("/file/:attachmentId", (req, res) => {
+    messagesApp.getAttachmentPath(req.params.attachmentId).then((path) => {
+        res.sendFile(path);
+    });
+});
 
 const httpServer = app.listen(port, () => console.log(`Listening on port ${port}...`));
 
