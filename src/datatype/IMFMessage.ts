@@ -7,7 +7,7 @@ type IMFBaseMessage = {
     content: {
         text?: string;
         attachment?: {
-            id: string;
+            id: number;
             mimetype: string;
         };
     };
