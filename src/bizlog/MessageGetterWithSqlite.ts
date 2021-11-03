@@ -29,7 +29,9 @@ class MessageGetterWithSqlite implements MessageGetter {
                 }
 
                 const messages: IMFMessage[] = rows.map((row) => {
-                    const content = row.attachment_id ? { id: row.attachment_id, mimetype: row.mime_type } : { text: row.text };
+                    const content = row.attachment_id
+                        ? { id: row.attachment_id, mimetype: row.mime_type }
+                        : { text: row.text };
                     return {
                         id: row.message_id,
                         service: row.service,
@@ -37,7 +39,7 @@ class MessageGetterWithSqlite implements MessageGetter {
                         status: getMessageStatus(row.is_from_me),
                         handle: row.chat_identifier,
                         alias: row.chat_identifier,
-                        content
+                        content,
                     };
                 });
                 resolve(messages);
@@ -57,12 +59,13 @@ class MessageGetterWithSqlite implements MessageGetter {
             return messages;
         });
 
-    getAttachmentPath = (attachmentId: number): Promise<string> => new Promise((resolve, reject) => {
-        this.db.each(this.GET_ATTACHMENT, [attachmentId], (err, row) => {
-            if (err) reject(err);
-            resolve(resolveUserHome(row.filename as string));
+    getAttachmentPath = (attachmentId: number): Promise<string> =>
+        new Promise((resolve, reject) => {
+            this.db.each(this.GET_ATTACHMENT, [attachmentId], (err, row) => {
+                if (err) reject(err);
+                resolve(resolveUserHome(row.filename as string));
+            });
         });
-    });
 
     close = () => {
         try {
