@@ -68,7 +68,7 @@ app.ws("/", (ws) => {
 messagesApp.listen((m) => wsServer.clients.forEach((client) => client.send(JSON.stringify(m))));
 
 // Handle file requests (HTTP)
-app.get("/file/:attachmentId", (req, res) => {
+app.get("/attachment/:attachmentId", (req, res) => {
     messagesApp.getAttachmentPath(req.params.attachmentId).then((path) => {
         res.sendFile(path);
     });
