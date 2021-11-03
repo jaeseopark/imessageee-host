@@ -30,7 +30,7 @@ class MessageGetterWithSqlite implements MessageGetter {
 
                 const messages: IMFMessage[] = rows.map((row) => {
                     const content = row.attachment_id
-                        ? { id: row.attachment_id, mimetype: row.mime_type }
+                        ? { attachment: { id: row.attachment_id, mimetype: row.mime_type } }
                         : { text: row.text };
                     return {
                         id: row.message_id,
