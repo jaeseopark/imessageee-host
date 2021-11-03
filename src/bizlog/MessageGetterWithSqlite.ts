@@ -3,10 +3,9 @@ import sqlite3 from "sqlite3";
 
 import IMFMessage, { IMFMessageStatus } from "../datatype/IMFMessage";
 import { MessageGetter } from "../interface/MessageGetter";
+import { resolveUserHome } from "../util/fspath";
 
 const SQLITE_PATH = `${process.env.HOME}/Library/Messages/chat.db`;
-
-const GET_MESSAGES_BY_ORG_DATE = fs.readFileSync("src/sql/getMessagesByOriginalDate.sql", { encoding: "utf-8" });
 
 const getMessageStatus = (isFromMe: boolean): IMFMessageStatus => {
     // TODO need more params to make a better decision here.
@@ -14,29 +13,35 @@ const getMessageStatus = (isFromMe: boolean): IMFMessageStatus => {
 };
 
 class MessageGetterWithSqlite implements MessageGetter {
+    private GET_MESSAGES_BY_ORG_DATE = fs.readFileSync("src/sql/getMessagesByOriginalDate.sql", { encoding: "utf-8" });
+    private GET_ATTACHMENT = fs.readFileSync("src/sql/getAttachmentPath.sql", { encoding: "utf-8" });
+
     private db = new sqlite3.Database(SQLITE_PATH);
     private latestMessageId = 0;
 
     private getMessages = (messageDate: number, limit: number): Promise<IMFMessage[]> =>
         new Promise((resolve, reject) => {
             const params = [messageDate, limit];
-            this.db.all(GET_MESSAGES_BY_ORG_DATE, params, (err, rows) => {
+            this.db.all(this.GET_MESSAGES_BY_ORG_DATE, params, (err, rows) => {
                 if (err) {
                     console.error(err);
                     reject(err);
                 }
 
-                const messages: IMFMessage[] = rows.map((row) => ({
-                    id: row.message_id,
-                    service: row.service,
-                    timestamp: row.message_date,
-                    status: getMessageStatus(row.is_from_me),
-                    handle: row.chat_identifier,
-                    alias: row.chat_identifier,
-                    content: {
-                        text: row.text,
-                    },
-                }));
+                const messages: IMFMessage[] = rows.map((row) => {
+                    const content = row.attachment_id
+                        ? { attachment: { id: row.attachment_id, mimetype: row.mime_type } }
+                        : { text: row.text };
+                    return {
+                        id: row.message_id,
+                        service: row.service,
+                        timestamp: row.message_date,
+                        status: getMessageStatus(row.is_from_me),
+                        handle: row.chat_identifier,
+                        alias: row.chat_identifier,
+                        content,
+                    };
+                });
                 resolve(messages);
             });
         });
@@ -52,6 +57,14 @@ class MessageGetterWithSqlite implements MessageGetter {
                 console.log(`this.latestMessageId=${this.latestMessageId}`);
             }
             return messages;
+        });
+
+    getAttachmentPath = (attachmentId: number): Promise<string> =>
+        new Promise((resolve, reject) => {
+            this.db.each(this.GET_ATTACHMENT, [attachmentId], (err, row) => {
+                if (err) reject(err);
+                resolve(resolveUserHome(row.filename as string));
+            });
         });
 
     close = () => {

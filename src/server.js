@@ -67,6 +67,13 @@ app.ws("/", (ws) => {
 // Handle incoming messages (written by a friend)
 messagesApp.listen((m) => wsServer.clients.forEach((client) => client.send(JSON.stringify(m))));
 
+// Handle file requests (HTTP)
+app.get("/attachment/:attachmentId", (req, res) => {
+    messagesApp.getAttachmentPath(req.params.attachmentId).then((path) => {
+        res.sendFile(path);
+    });
+});
+
 const httpServer = app.listen(port, () => console.log(`Listening on port ${port}...`));
 
 // Graceful shutdown
