@@ -10,13 +10,21 @@ export type IMFMessageContent = {
     };
 };
 
+export type IMFOutgoingMessageContent = {
+    text?: string;
+    attachment?: {
+        data: string; // b64 to make it work with the existing endpoint -- consider using bytestream later.
+        mimetype: string;
+    };
+};
+
 type IMFBaseMessage = {
     handle: string;
-    content: IMFMessageContent;
 };
 
 export type IMFOutgoingMessage = IMFBaseMessage & {
     service?: IMFService;
+    content: IMFOutgoingMessageContent;
 };
 
 type IMFMessage = IMFBaseMessage & {
@@ -25,6 +33,7 @@ type IMFMessage = IMFBaseMessage & {
     alias: string;
     status: IMFMessageStatus;
     timestamp: number;
+    content: IMFMessageContent;
 };
 
 export default IMFMessage;
