@@ -38,11 +38,15 @@ class MessagesApp {
         }
     };
 
+    private decorateMessageInPlace = (message: IMFMessage) => {
+        this.substituteContactAliasInPlace(message);
+    }
+
     getPreloadEvents = (): Promise<IMFEvent[]> =>
         this.mGetter.getRecentMessages().then((messages) => {
             console.log(messages.length, "preloaded messages");
             return split(messages, MESSAGES_PER_EVENT).map((chunk) => {
-                chunk.forEach(this.substituteContactAliasInPlace);
+                chunk.forEach(this.decorateMessageInPlace);
                 return { messages: chunk, type: "MESSAGE_PRELOAD" };
             });
         }
@@ -58,6 +62,7 @@ class MessagesApp {
                     console.log(messages.length, "new messages");
                 }
                 split(messages, MESSAGES_PER_EVENT).forEach((chunk) => {
+                    chunk.forEach(this.decorateMessageInPlace);
                     onReceive({
                         messages: chunk,
                         type: "MESSAGE_NEW",
