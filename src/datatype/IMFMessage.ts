@@ -9,7 +9,7 @@ export type IMFAttachment = {
 
 export type IMFMessageContent = {
     text?: string;
-    attachment?: IMFAttachment;
+    attachments?: IMFAttachment[];
 };
 
 export type IMFOutgoingMessageContent = {

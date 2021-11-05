@@ -32,21 +32,39 @@ class MessageGetterWithSqlite implements MessageGetter {
                     reject(err);
                 }
 
-                const messages: IMFMessage[] = rows.map((row) => ({
-                    id: row.message_id,
-                    service: row.service,
-                    timestamp: row.message_date,
-                    status: getMessageStatus(row.is_from_me),
-                    handle: row.chat_identifier,
-                    alias: row.chat_identifier,
-                    content: {
-                        text: row.text && sanitizeText(row.text),
-                        attachment: row.attachment_id && {
+                const messages: IMFMessage[] = rows.reduce((acc, row) => {
+                    const id = row.message_id;
+                    let message = acc[id];
+
+                    if (!message) {
+                        message = {
+                            id,
+                            service: row.service,
+                            timestamp: row.message_date,
+                            status: getMessageStatus(row.is_from_me),
+                            handle: row.chat_identifier,
+                            alias: row.chat_identifier,
+                            content: {
+                                text: row.text && sanitizeText(row.text),
+                            },
+                        };
+                        acc[id] = message;
+                    }
+
+                    if (row.attachment_id) {
+                        const attachment = {
                             id: row.attachment_id,
                             mimetype: row.mime_type
+                        };
+                        if (message.content.attachments) {
+                            message.content.attachments.push(attachment);
+                        } else {
+                            message.content.attachments = [attachment];
                         }
-                    },
-                }));
+                    }
+
+                    return acc;
+                }, {});
                 resolve(messages);
             });
         });
