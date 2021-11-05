@@ -42,7 +42,8 @@ const reduceRows = (acc: ReducedRows, row: any) => {
     if (row.attachment_id) {
         const attachment = {
             id: row.attachment_id,
-            mimetype: row.mime_type
+            mimetype: row.mime_type,
+            size: row.total_bytes
         };
         if (message.content.attachments) {
             message.content.attachments.push(attachment);
