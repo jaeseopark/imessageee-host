@@ -32,7 +32,7 @@ class MessageGetterWithSqlite implements MessageGetter {
                     reject(err);
                 }
 
-                const messages: IMFMessage[] = rows.reduce((acc, row) => {
+                const messages: { [id: string]: IMFMessage } = rows.reduce((acc, row) => {
                     const id = row.message_id;
                     let message = acc[id];
 
@@ -65,7 +65,8 @@ class MessageGetterWithSqlite implements MessageGetter {
 
                     return acc;
                 }, {});
-                resolve(messages);
+
+                resolve(Object.values(messages));
             });
         });
 
