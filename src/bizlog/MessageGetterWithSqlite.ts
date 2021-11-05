@@ -1,9 +1,9 @@
 import fs from "fs";
 import sqlite3 from "sqlite3";
-
 import IMFMessage, { IMFMessageStatus } from "../datatype/IMFMessage";
 import { MessageGetter } from "../interface/MessageGetter";
 import { resolveUserHome } from "../util/fspath";
+
 
 const SQLITE_PATH = `${process.env.HOME}/Library/Messages/chat.db`;
 const PRELOAD_MESSAGE_COUNT_LIMIT = 1000;
@@ -43,7 +43,7 @@ const reduceRows = (acc: ReducedRows, row: any) => {
         const attachment = {
             id: row.attachment_id,
             mimetype: row.mime_type,
-            size: row.total_bytes
+            size: row.total_bytes,
         };
         if (message.content.attachments) {
             message.content.attachments.push(attachment);

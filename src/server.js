@@ -69,11 +69,14 @@ messagesApp.listen((m) => wsServer.clients.forEach((client) => client.send(JSON.
 
 // Handle file requests (HTTP)
 app.get("/attachment/:attachmentId", (req, res) => {
-    messagesApp.getAttachmentPath(req.params.attachmentId).then((path) => {
-        res.sendFile(path);
-    }).catch((err) => {
-        res.send(JSON.stringify(err));
-    });
+    messagesApp
+        .getAttachmentPath(req.params.attachmentId)
+        .then((path) => {
+            res.sendFile(path);
+        })
+        .catch((err) => {
+            res.send(JSON.stringify(err));
+        });
 });
 
 const httpServer = app.listen(port, () => console.log(`Listening on port ${port}...`));

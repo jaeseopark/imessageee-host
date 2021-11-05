@@ -40,7 +40,7 @@ class MessagesApp {
 
     private decorateMessageInPlace = (message: IMFMessage) => {
         this.substituteContactAliasInPlace(message);
-    }
+    };
 
     getPreloadEvents = (): Promise<IMFEvent[]> =>
         this.mGetter.getRecentMessages().then((messages) => {
@@ -49,8 +49,7 @@ class MessagesApp {
                 chunk.forEach(this.decorateMessageInPlace);
                 return { messages: chunk, type: "MESSAGE_PRELOAD" };
             });
-        }
-        );
+        });
 
     send = (m: IMFOutgoingMessage) => this.mSender.sendMessage(m);
 
