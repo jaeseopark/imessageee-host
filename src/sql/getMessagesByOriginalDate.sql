@@ -8,7 +8,8 @@ select
     ) * 1000 as message_date,
     is_from_me,
     attachment_id,
-    mime_type
+    mime_type,
+    total_bytes
 from
     message m
     inner join chat_message_join cmj on cmj.message_id = m.ROWID

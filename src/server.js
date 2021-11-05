@@ -34,6 +34,8 @@ app.ws("/", (ws) => {
             .then((events) => events.forEach((event) => ws.send(JSON.stringify(event))));
 
         ws.on("message", (msg) => {
+            console.log("message event");
+
             if (!isValidJson(msg)) {
                 return ws.send(
                     JSON.stringify({
@@ -43,8 +45,6 @@ app.ws("/", (ws) => {
             }
 
             const reqBody = JSON.parse(msg);
-            console.log(reqBody);
-
             messagesApp.send(reqBody).catch((error) =>
                 ws.send(
                     JSON.stringify({
@@ -69,9 +69,14 @@ messagesApp.listen((m) => wsServer.clients.forEach((client) => client.send(JSON.
 
 // Handle file requests (HTTP)
 app.get("/attachment/:attachmentId", (req, res) => {
-    messagesApp.getAttachmentPath(req.params.attachmentId).then((path) => {
-        res.sendFile(path);
-    });
+    messagesApp
+        .getAttachmentPath(req.params.attachmentId)
+        .then((path) => {
+            res.sendFile(path);
+        })
+        .catch((err) => {
+            res.send(JSON.stringify(err));
+        });
 });
 
 const httpServer = app.listen(port, () => console.log(`Listening on port ${port}...`));
