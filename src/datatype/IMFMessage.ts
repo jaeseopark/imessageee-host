@@ -5,6 +5,7 @@ export type IMFService = "iMessage" | "SMS";
 export type IMFAttachment = {
     id: number;
     mimetype: string;
+    size: number;
 };
 
 export type IMFMessageContent = {
