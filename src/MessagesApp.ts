@@ -1,3 +1,4 @@
+import parsePhoneNumber from 'libphonenumber-js'
 import MessageHandlerFactory from "./bizlog/MessageHandlerFactoryImpl";
 import IMFMessage, { IMFOutgoingMessage } from "./datatype/IMFMessage";
 import IMFEvent from "./datatype/IMFEvent";
@@ -5,11 +6,39 @@ import { split } from "./util/arrays";
 import { MessageSender } from "./interface/MessageSender";
 import { MessageGetter } from "./interface/MessageGetter";
 import { ReverseLookp } from "./interface/ContactGetter";
+import LocalFileManager from "./bizlog/LocalFileManager";
+
+const APP_DIR = "~/.imf";
+const CONTACT_CACHE_PATH = "contacts.json";
+const LOCAL_FILE_MANGER = new LocalFileManager(APP_DIR);
 
 const GET_MESSAGE_POLL_INTERVAL = 1000; // ms
 const MESSAGES_PER_EVENT = 100;
 
 type OnReceive = (m: IMFEvent) => void;
+
+// TODO: move out to a new file
+const normalizeContactLookup = (reverseLookup: ReverseLookp) => {
+    const defaultCountry = "US";
+    const normalized: ReverseLookp = {};
+    Object.entries(reverseLookup).forEach(([handle, alias]) => {
+        const isEmail = handle.includes("@");
+        if (isEmail) {
+            normalized[handle] = alias;
+            return;
+        }
+
+        const phoneNumber = parsePhoneNumber(handle, defaultCountry);
+        if (phoneNumber) {
+            const normalizedHandle = phoneNumber.formatInternational().replace(/ /g, "");
+            normalized[normalizedHandle] = alias;
+        } else {
+            normalized[handle] = alias;
+        }
+    });
+
+    return normalized;
+}
 
 class MessagesApp {
     private interval?: NodeJS.Timer;
@@ -22,12 +51,19 @@ class MessagesApp {
         this.mSender = factory.getMessageSender();
         this.mGetter = factory.getMessageGetter();
 
+        if (LOCAL_FILE_MANGER.exists(CONTACT_CACHE_PATH)) {
+            this.contactReverseLookup = LOCAL_FILE_MANGER.readJson(CONTACT_CACHE_PATH);
+            console.log("consumed contact cache from local disk");
+        }
+
         factory
             .getContactGetter()
             .getReverseLookup()
-            .then((rLookup) => {
-                this.contactReverseLookup = rLookup;
-                console.log("Reverse Lookup table registered");
+            .then(normalizeContactLookup)
+            .then((reverseLookup) => {
+                this.contactReverseLookup = reverseLookup;
+                console.log("Reverse Lookup table registered.", "length:", Object.keys(reverseLookup).length);
+                LOCAL_FILE_MANGER.writeJson(CONTACT_CACHE_PATH, reverseLookup);
             });
     }
 
