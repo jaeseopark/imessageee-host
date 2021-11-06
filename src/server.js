@@ -18,6 +18,8 @@ const iCloudHandlerFactory = new ICloudHandlerFactoryImpl();
 const contactsApp = new ContactsApp(iCloudHandlerFactory);
 const messagesApp = new MessagesApp(contactsApp, iCloudHandlerFactory);
 
+contactsApp.initialize();
+
 app.use(express.json());
 app.use(
     cors({
@@ -88,8 +90,6 @@ app.get("/attachment/:attachmentId", (req, res) => {
             res.send(JSON.stringify(err));
         });
 });
-
-contactsApp.initialize();
 
 const httpServer = app.listen(port, () => console.log(`Listening on port ${port}...`));
 
