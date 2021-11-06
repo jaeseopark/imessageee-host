@@ -21,6 +21,8 @@ class FSAdapter {
         return fs.readFileSync(fullPath, "utf-8");
     }
 
+    readStringAsync = async (path: string) => this.readString(path);
+
     writeString = (path: string, data: string) => {
         this.createAppDir();
         const fullPath = pathLib.join(this.appDir, path);

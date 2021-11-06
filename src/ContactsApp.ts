@@ -1,72 +1,65 @@
 import parsePhoneNumber from 'libphonenumber-js'
-import ContactGetter, { Contact, ReverseLookp } from "./interface/ContactGetter";
+import IMFContact from './datatype/IMFContact';
+import ContactGetter, { ReverseIndex } from "./interface/ContactGetter";
 import FSAdapter from "./interface/FSAdapter";
 import { ICloudHandlerFactory } from "./interface/ICloudHandlerFactory";
 
 const APP_DIR = "~/.imf/contacts";
-const CONTACT_CACHE_PATH = "contacts.json";
-const CONTACT_REVERSE_CACHE_PATH = "contacts_reverse.json";
+const CONTACT_CACHE_PATH = "cached.json";
+const CONTACT_REVERSE_CACHE_PATH = "cached_reverse.json";
+
+const DEFAULT_COUNTRY = "US";
+
+const normalizeHandle = (handle: string) => {
+    const isPhone = !handle.includes("@");
+    if (isPhone) {
+        const phoneNumber = parsePhoneNumber(handle, DEFAULT_COUNTRY);
+        if (phoneNumber) {
+            return phoneNumber.formatInternational().replace(/ /g, "");
+        }
+    }
+    return handle;
+}
 
 class ContactsApp extends FSAdapter {
     contactGetter: ContactGetter;
-    contacts: Contact[] = [];
-    reverseLookup: ReverseLookp = {};
+    contacts: IMFContact[] = [];
+    reverseIndex: ReverseIndex = {};
 
     constructor(iCloudHandlerFactory: ICloudHandlerFactory) {
         super(APP_DIR);
         this.contactGetter = iCloudHandlerFactory.getContactGetter();
-    }
 
-    initialize = async () => {
         this.contacts = this.readJson(CONTACT_CACHE_PATH) || [];
-        this.reverseLookup = this.readJson(CONTACT_REVERSE_CACHE_PATH) || {};
-
-        return this.contactGetter
-            .getContacts()
-            .then(contacts => {
-                this.writeJson(CONTACT_CACHE_PATH, contacts);
-                return contacts;
-            })
-            .then((contacts) =>
-                contacts.reduce((acc: ReverseLookp, contact) => {
-                    contact.handles
-                        .filter(handle => handle)
-                        .forEach((handle) => {
-                            acc[handle] = contact.name;
-                        });
-                    return acc;
-                }, {}))
-            .then((reverseLookup) => {
-                this.writeJson(CONTACT_REVERSE_CACHE_PATH, reverseLookup);
-                this.reverseLookup = reverseLookup;
-            });
+        this.reverseIndex = this.readJson(CONTACT_REVERSE_CACHE_PATH) || {};
     }
 
-    normalizeContactLookup = (reverseLookup: ReverseLookp) => {
-        const defaultCountry = "US";
-        const normalized: ReverseLookp = {};
-        Object.entries(reverseLookup).forEach(([handle, alias]) => {
-            const isEmail = handle.includes("@");
-            if (isEmail) {
-                normalized[handle] = alias;
-                return;
-            }
-
-            const phoneNumber = parsePhoneNumber(handle, defaultCountry);
-            if (phoneNumber) {
-                const normalizedHandle = phoneNumber.formatInternational().replace(/ /g, "");
-                normalized[normalizedHandle] = alias;
-            } else {
-                normalized[handle] = alias;
-            }
+    initialize = () => this.contactGetter
+        .getContacts()
+        .then((contacts) => contacts.map(({ name, handles }) => ({
+            name,
+            handles: handles.filter(handle => handle).map(normalizeHandle)
+        })))
+        .then((contacts) => {
+            this.writeJson(CONTACT_CACHE_PATH, contacts);
+            return contacts;
+        })
+        .then((contacts) =>
+            contacts.reduce((acc: ReverseIndex, contact) => {
+                contact.handles
+                    .forEach((handle) => {
+                        acc[handle] = contact.name;
+                    });
+                return acc;
+            }, {}))
+        .then((reverseIndex) => {
+            this.writeJson(CONTACT_REVERSE_CACHE_PATH, reverseIndex);
+            this.reverseIndex = reverseIndex;
         });
 
-        return normalized;
-    }
+    getAliasByHandle = (handle: string) => this.reverseIndex[handle];
 
-    getAliasByHandle = (handle: string) => this.reverseLookup[handle];
-
-    isReady = () => Object.keys(this.reverseLookup).length > 0;
+    isReady = () => Object.keys(this.reverseIndex).length > 0;
 }
 
 export default ContactsApp;

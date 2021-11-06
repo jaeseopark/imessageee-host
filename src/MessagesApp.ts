@@ -1,4 +1,4 @@
-import MessageHandlerFactory from "./bizlog/MessageHandlerFactoryImpl";
+import MessageHandlerFactory from "./bizlog/ICloudHandlerFactoryImpl";
 import IMFMessage, { IMFOutgoingMessage } from "./datatype/IMFMessage";
 import IMFEvent from "./datatype/IMFEvent";
 import { split } from "./util/arrays";
