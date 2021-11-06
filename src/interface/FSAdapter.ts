@@ -28,9 +28,9 @@ class FSAdapter {
     }
 
     readJson = (path: string): any => {
-        const fullPath = pathLib.join(this.appDir, path);
-        if (!fs.existsSync(fullPath)) return null;
-        return JSON.parse(this.readString(path)!);
+        const s = this.readString(path);
+        if (!s) return null;
+        return JSON.parse(s);
     }
 
     writeJson = (path: string, data: any) => {
