@@ -9,6 +9,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-ws": "^5.0.2",
+    "libphonenumber-js": "^1.9.42",
     "run-applescript": "^6.0.0",
     "sqlite3": "^5.0.2",
     "typescript": "^4.4.4"

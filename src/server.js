@@ -4,15 +4,21 @@ import expressWs from "express-ws";
 
 import { isValidJson } from "./util/serial.js";
 import MessagesApp from "./MessagesApp.js";
-import MessageHandlerFactoryImpl from "./bizlog/MessageHandlerFactoryImpl.js";
+import ICloudHandlerFactoryImpl from "./bizlog/ICloudHandlerFactoryImpl.js";
+import ContactsApp from "./ContactsApp.js";
+
+const READINESS_CHECK_INTERVAL = 5000;
 
 const port = process.env.IMF_PORT || 3237;
 const wsInstance = expressWs(express());
 const app = wsInstance.app;
 const wsServer = wsInstance.getWss();
 
-const messageHandlerFactory = new MessageHandlerFactoryImpl();
-const messagesApp = new MessagesApp(messageHandlerFactory);
+const iCloudHandlerFactory = new ICloudHandlerFactoryImpl();
+const contactsApp = new ContactsApp(iCloudHandlerFactory);
+const messagesApp = new MessagesApp(contactsApp, iCloudHandlerFactory);
+
+contactsApp.initialize();
 
 app.use(express.json());
 app.use(
@@ -24,9 +30,8 @@ app.use(
 // Handle outgoing messages (written by me)
 app.ws("/", (ws) => {
     const configureClient = () => {
-        if (!messagesApp.isReady()) {
-            setTimeout(configureClient, 3000);
-            return;
+        if (!contactsApp.isReady()) {
+            return setTimeout(configureClient, READINESS_CHECK_INTERVAL);
         }
 
         messagesApp
@@ -65,7 +70,14 @@ app.ws("/", (ws) => {
 });
 
 // Handle incoming messages (written by a friend)
-messagesApp.listen((m) => wsServer.clients.forEach((client) => client.send(JSON.stringify(m))));
+const listen = () => {
+    if (!contactsApp.isReady()) {
+        return setTimeout(listen, READINESS_CHECK_INTERVAL);
+    }
+    console.log("Listening for incoming messages...");
+    messagesApp.listen((m) => wsServer.clients.forEach((client) => client.send(JSON.stringify(m))));
+};
+listen();
 
 // Handle file requests (HTTP)
 app.get("/attachment/:attachmentId", (req, res) => {

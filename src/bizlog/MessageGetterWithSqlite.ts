@@ -4,7 +4,6 @@ import IMFMessage, { IMFMessageStatus } from "../datatype/IMFMessage";
 import { MessageGetter } from "../interface/MessageGetter";
 import { resolveUserHome } from "../util/fspath";
 
-
 const SQLITE_PATH = `${process.env.HOME}/Library/Messages/chat.db`;
 const PRELOAD_MESSAGE_COUNT_LIMIT = 1000;
 const POLL_MESSAGE_COUNT_LIMIT = 25;
@@ -93,9 +92,12 @@ class MessageGetterWithSqlite implements MessageGetter {
 
     getAttachmentPath = (attachmentId: number): Promise<string> =>
         new Promise((resolve, reject) => {
-            this.db.each(this.GET_ATTACHMENT, [attachmentId], (err, row) => {
-                if (err) reject(err);
-                if (!row?.filename) reject(new Error("No results"));
+            this.db.all(this.GET_ATTACHMENT, [attachmentId], (err, rows) => {
+                if (err) return reject(err);
+                if (rows.length === 0) return reject(new Error("No results"));
+                
+                const [row] = rows;
+                if (!row.filename) return reject(new Error("Empty filename"));
                 resolve(resolveUserHome(row.filename as string));
             });
         });

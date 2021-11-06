@@ -1,10 +1,10 @@
-import MessageHandlerFactory from "./bizlog/MessageHandlerFactoryImpl";
+import MessageHandlerFactory from "./bizlog/ICloudHandlerFactoryImpl";
 import IMFMessage, { IMFOutgoingMessage } from "./datatype/IMFMessage";
 import IMFEvent from "./datatype/IMFEvent";
 import { split } from "./util/arrays";
 import { MessageSender } from "./interface/MessageSender";
 import { MessageGetter } from "./interface/MessageGetter";
-import { ReverseLookp } from "./interface/ContactGetter";
+import ContactsApp from './ContactsApp';
 
 const GET_MESSAGE_POLL_INTERVAL = 1000; // ms
 const MESSAGES_PER_EVENT = 100;
@@ -15,24 +15,17 @@ class MessagesApp {
     private interval?: NodeJS.Timer;
     private mSender: MessageSender;
     private mGetter: MessageGetter;
-    private contactReverseLookup: ReverseLookp = {};
+    private contactsApp: ContactsApp;
 
-    constructor(factory: MessageHandlerFactory) {
+    constructor(contactsApp: ContactsApp, factory: MessageHandlerFactory) {
         console.log("Initializing MessagesApp...");
+        this.contactsApp = contactsApp;
         this.mSender = factory.getMessageSender();
         this.mGetter = factory.getMessageGetter();
-
-        factory
-            .getContactGetter()
-            .getReverseLookup()
-            .then((rLookup) => {
-                this.contactReverseLookup = rLookup;
-                console.log("Reverse Lookup table registered");
-            });
     }
 
     private substituteContactAliasInPlace = (message: IMFMessage) => {
-        const alias = this.contactReverseLookup[message.handle];
+        const alias = this.contactsApp.getAliasByHandle(message.handle);
         if (alias) {
             message.alias = alias;
         }
@@ -55,7 +48,6 @@ class MessagesApp {
 
     listen = (onReceive: OnReceive) => {
         this.interval = setInterval(() => {
-            if (!this.isReady()) return;
             this.mGetter.getNewMessages().then((messages) => {
                 if (messages.length > 0) {
                     console.log(messages.length, "new messages");
@@ -79,8 +71,6 @@ class MessagesApp {
             clearInterval(this.interval);
         }
     };
-
-    isReady = () => Object.keys(this.contactReverseLookup).length > 0;
 
     cleanup = () => {
         this.stopListening();
