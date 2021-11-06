@@ -1,5 +1,6 @@
 import parsePhoneNumber from 'libphonenumber-js'
 import IMFContact from './datatype/IMFContact';
+import IMFEvent from './datatype/IMFEvent';
 import ContactGetter, { ReverseIndex } from "./interface/ContactGetter";
 import FSAdapter from "./interface/FSAdapter";
 import { ICloudHandlerFactory } from "./interface/ICloudHandlerFactory";
@@ -58,6 +59,11 @@ class ContactsApp extends FSAdapter {
         });
 
     getAliasByHandle = (handle: string) => this.reverseIndex[handle];
+
+    getPreloadEvent = (): Promise<IMFEvent> => Promise.resolve({
+        contacts: this.contacts,
+        type: "CONTACTS"
+    });
 
     isReady = () => Object.keys(this.reverseIndex).length > 0;
 }

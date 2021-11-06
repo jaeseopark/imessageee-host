@@ -34,6 +34,10 @@ app.ws("/", (ws) => {
             return setTimeout(configureClient, READINESS_CHECK_INTERVAL);
         }
 
+        contactsApp
+            .getPreloadEvent()
+            .then((event) => ws.send(JSON.stringify(event)));
+
         messagesApp
             .getPreloadEvents()
             .then((events) => events.forEach((event) => ws.send(JSON.stringify(event))));
@@ -83,6 +87,18 @@ listen();
 app.get("/attachment/:attachmentId", (req, res) => {
     messagesApp
         .getAttachmentPath(req.params.attachmentId)
+        .then((path) => {
+            res.sendFile(path);
+        })
+        .catch((err) => {
+            res.send(JSON.stringify(err));
+        });
+});
+
+// Handle profile picture requests (HTTP)
+app.get("/contact/:contactId/picture", (req, res) => {
+    contactsApp
+        .getProfilePicturePath(req.params.contactId)
         .then((path) => {
             res.sendFile(path);
         })

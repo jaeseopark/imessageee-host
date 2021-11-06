@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { runAppleScript, runAppleScriptSync } from "run-applescript";
 
 import { IMFOutgoingMessage } from "../datatype/IMFMessage";
@@ -39,7 +40,12 @@ class AppleScriptExecuter extends FSAdapter implements MessageSender, ContactGet
             }, {})
         )
         .then((contactMap) => {
-            return Object.keys(contactMap).map((name) => ({ name, handles: contactMap[name] }));
+            return Object.keys(contactMap).map((name) => ({
+                id: crypto.createHash('md5').update(name).digest('hex'),
+                name,
+                handles: contactMap[name],
+                hasProfilePicture: false
+            }));
         });
 
     close = () => {
