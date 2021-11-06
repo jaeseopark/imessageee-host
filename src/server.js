@@ -4,7 +4,7 @@ import expressWs from "express-ws";
 
 import { isValidJson } from "./util/serial.js";
 import MessagesApp from "./MessagesApp.js";
-import ICloudHandlerFactoryImpl from "./bizlog/MessageHandlerFactoryImpl.js";
+import ICloudHandlerFactoryImpl from "./bizlog/ICloudHandlerFactoryImpl.js";
 import ContactsApp from "./ContactsApp.js";
 
 const READINESS_CHECK_INTERVAL = 5000;
