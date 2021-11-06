@@ -7,6 +7,10 @@ tell application "Contacts"
 			set theNum to (get value of eachNumber)
 			set csv to csv & personName & "," & theNum & "\n"
 		end repeat
+		repeat with eachEmail in emails of eachPerson
+			set theEmail to (get value of eachEmail)
+			set csv to csv & personName & "," & theEmail & "\n"
+		end repeat
 	end repeat
 end tell
 

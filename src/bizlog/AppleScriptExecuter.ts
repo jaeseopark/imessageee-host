@@ -41,9 +41,11 @@ class AppleScriptExecuter implements MessageSender, ContactGetter {
     getReverseLookup = () =>
         this.getContacts().then((contacts) =>
             contacts.reduce((acc: ReverseLookp, contact) => {
-                contact.handles.forEach((handle) => {
-                    acc[handle] = contact.name;
-                });
+                contact.handles
+                    .filter(handle => handle)
+                    .forEach((handle) => {
+                        acc[handle] = contact.name;
+                    });
                 return acc;
             }, {})
         );
