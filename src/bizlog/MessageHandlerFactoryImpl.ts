@@ -2,7 +2,7 @@ import { ICloudHandlerFactory } from "../interface/ICloudHandlerFactory";
 import MessageGetterWithSqlite from "./MessageGetterWithSqlite";
 import AppleScriptExecuter from "./AppleScriptExecuter";
 
-class MessageHandlerFactoryImpl implements ICloudHandlerFactory {
+class ICloudHandlerFactoryImpl implements ICloudHandlerFactory {
     private appleScriptExecutor = new AppleScriptExecuter();
 
     getContactGetter = () => this.appleScriptExecutor;
@@ -14,4 +14,4 @@ class MessageHandlerFactoryImpl implements ICloudHandlerFactory {
     };
 }
 
-export default MessageHandlerFactoryImpl;
+export default ICloudHandlerFactoryImpl;
