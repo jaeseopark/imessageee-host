@@ -33,5 +33,5 @@ Tested on:
 
     IMF_PORT=1234 yarn start # customize the port
     ```
-1. Proceed to installing [react-imf](https://github.com/jaeseopark/react-imf) or bring your own GUI. Happy messaging!
+1. Proceed to installing [imessageforwarder-web](https://github.com/jaeseopark/imessageforwarder-web) or bring your own GUI. Happy messaging!
 
