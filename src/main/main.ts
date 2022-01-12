@@ -11,11 +11,13 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
+import { hostname } from "os";
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { start as startServer } from './port/server';
 
 export default class AppUpdater {
   constructor() {
@@ -73,10 +75,11 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 700,
+    height: 300,
     icon: getAssetPath('icon.png'),
     webPreferences: {
+      nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js'),
     },
   });
@@ -116,6 +119,8 @@ const createWindow = async () => {
  * Add event listeners...
  */
 
+ipcMain.handle("getHostname", () => hostname());
+
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
@@ -127,11 +132,21 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(() => {
+    const log = (message: string) => {
+      console.log(message);
+      if (mainWindow !== null) {
+        mainWindow.webContents.send("log", message);
+      }
+    };
+
+    startServer(log);
+    // TODO: server.shutdown()
+
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) createWindow();
+      if (mainWindow === null) { createWindow() };
     });
   })
   .catch(console.log);

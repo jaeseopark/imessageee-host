@@ -226,9 +226,12 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.4",
     "electron-updater": "^4.6.4",
+    "express": "^4.17.2",
+    "express-ws": "^5.0.2",
     "history": "^5.2.0",
     "libphonenumber-js": "^1.9.44",
     "react": "^17.0.2",

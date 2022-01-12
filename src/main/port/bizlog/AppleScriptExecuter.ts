@@ -1,4 +1,7 @@
-import { runAppleScript, runAppleScriptSync } from "run-applescript";
+const runAppleScript = (...args) => import('run-applescript').then(({runAppleScript}) => {
+    console.log("invoking through dynamic import wrapper");
+    return runAppleScript(...args);
+});
 
 import { IMFOutgoingMessage } from "../datatype/IMFMessage";
 import ContactGetter from "../interface/ContactGetter";
@@ -23,10 +26,8 @@ class AppleScriptExecuter extends FSAdapter implements MessageSender, ContactGet
 
         return this.readStringAsync(SEND_MESSAGE_SCRIPT_PATH)
             .then((template) => fill(template!, params))
-            .then((script) => {
-                runAppleScriptSync(script);
-                console.log("message sent");
-            })
+            .then(runAppleScript)
+            .then(() => console.log("message sent"));
     }
 
     getContacts = () => runAppleScript(this.readString(GET_CONTACTS_SCRIPT_PATH)!)
